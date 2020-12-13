@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -5,7 +6,7 @@ namespace AdventOfCode.Solutions.Year2020
 {
     internal class Day02 : ISolution
     {
-        record Password(int Min, int Max, char Letter, string Text);
+        record Password(int Pos1, int Pos2, char Letter, string Text);
 
         public string Run(int part, IEnumerable<string> input)
         {
@@ -21,18 +22,25 @@ namespace AdventOfCode.Solutions.Year2020
 
             return part switch
             {
-                1 => Part1(passwords).ToString(),
+                1 => CountValidPasswords(passwords, IsValid1).ToString(),
+                2 => CountValidPasswords(passwords, IsValid2).ToString(),
                 _ => null
             };
         }
 
-        static bool IsValid(Password password)
+        static bool IsValid1(Password password)
         {
             var letterCount = password.Text.Count(letter => letter == password.Letter);
-            return password.Min <= letterCount && letterCount <= password.Max;
+            return password.Pos1 <= letterCount && letterCount <= password.Pos2;
         }
 
-        static int Part1(IEnumerable<Password> passwords) =>
-            passwords.Where(IsValid).Count();
+        static bool IsValid2(Password password)
+        {
+            bool isMatch(int pos) => password.Text[pos - 1] == password.Letter;
+            return isMatch(password.Pos1) ^ isMatch(password.Pos2);
+        }
+
+        static int CountValidPasswords(IEnumerable<Password> passwords, Func<Password, bool> predicate) =>
+            passwords.Count(predicate);
     }
 }
