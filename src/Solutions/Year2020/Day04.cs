@@ -14,31 +14,34 @@ namespace AdventOfCode.Solutions.Year2020
             };
         }
         
-        static IEnumerable<HashSet<string>> KeysPerPassport(IEnumerable<string> input)
+        static IEnumerable<Dictionary<string, string>> KeysPerPassport(IEnumerable<string> input)
         {
-            var keys = new HashSet<string>();
+            var kvps = new Dictionary<string, string>();
 
             foreach (string line in input)
             {
                 if (line == "")
                 {
-                    yield return keys;
-                    keys = new HashSet<string>();
+                    yield return kvps;
+                    kvps = new Dictionary<string, string>();
                 }
                 else
                 {
                     foreach (string field in line.Split())
-                        keys.Add(field.Split(':')[0]);
+                    {
+                        var kvp = field.Split(':');
+                        kvps.Add(kvp[0], kvp[1]);
+                    }
                 }
             }
 
-            yield return keys;
+            yield return kvps;
         }
     
-        static bool PassportIsValid(HashSet<string> keys)
+        static bool PassportIsValid(Dictionary<string, string> kvps)
         {
             var required = new string[] { "byr", "iyr", "eyr", "hgt" , "hcl", "ecl", "pid"};
-            return required.All(key => keys.Contains(key));
+            return required.All(key => kvps.ContainsKey(key));
         }
     }
 }
