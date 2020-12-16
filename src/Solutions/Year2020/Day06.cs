@@ -10,25 +10,42 @@ namespace AdventOfCode.Solutions.Year2020
             return part switch
             {
                 1 => YesQuestionsPerGroup(input).Sum(yesQs => yesQs.Count).ToString(),
+                2 => YesQuestionsPerGroup(input, checkAll:true).Sum(yesQs => yesQs.Count).ToString(),
                 _ => null
             };
         }
 
-        static IEnumerable<HashSet<char>> YesQuestionsPerGroup(IEnumerable<string> input)
+        static IEnumerable<HashSet<char>> YesQuestionsPerGroup(IEnumerable<string> input, bool checkAll = false)
         {
-            var yesQuestions = new HashSet<char>();
+            HashSet<char> yesQuestions = null;
 
             foreach (string line in input)
             {
                 if (line == "")
                 {
                     yield return yesQuestions;
-                    yesQuestions = new HashSet<char>();
+                    yesQuestions = null;
                 }
                 else
                 {
-                    foreach (char yesQuestion in line)
-                        yesQuestions.Add(yesQuestion);
+                    void addLine(HashSet<char> set)
+                    {
+                        foreach (char yesQuestion in line)
+                            set.Add(yesQuestion);
+                    }
+
+                    if (yesQuestions is null)
+                    {
+                        yesQuestions = new HashSet<char>();
+                        addLine(yesQuestions);
+                    }
+                    else
+                    {
+                        if (checkAll)
+                            yesQuestions.IntersectWith(line);
+                        else
+                            addLine(yesQuestions);
+                    }
                 }
             }
 
