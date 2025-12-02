@@ -104,7 +104,7 @@ namespace AdventOfCode
 
         static string ReadCookie()
         {
-            var cookieFileName = "session_cookie";
+            var cookieFileName = "session-cookie";
             if (File.Exists(cookieFileName))
                 return File.ReadAllText(cookieFileName);
             Console.WriteLine($"Missing file {cookieFileName}");
