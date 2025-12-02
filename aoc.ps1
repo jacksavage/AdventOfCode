@@ -6,5 +6,6 @@ param(
 
 switch ($year) {
   2020 { dotnet run --project .\csharp $year $day $part }
+  2025 { Push-Location .\gleam\src && gleam run && Pop-Location }
   default { Write-Error "No solutions for year $year" }
 }
