@@ -26,7 +26,7 @@ Console.WriteLine();
 static SolutionID ParseArgs(string[] args)
 {
     if (
-        args.Length > 2
+        args.Length == 3
         && int.TryParse(args[0], out int year)
         && int.TryParse(args[1], out int day)
         && int.TryParse(args[2], out int part)
