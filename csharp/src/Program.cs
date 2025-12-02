@@ -1,7 +1,9 @@
 ﻿using System;
 using System.IO;
 using System.Net;
+using System.Net.Http;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace AdventOfCode
 {
@@ -9,7 +11,7 @@ namespace AdventOfCode
     {
         record SolutionID(int Year, int Day, int Part);
 
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             Console.WriteLine();
 
@@ -19,8 +21,8 @@ namespace AdventOfCode
             {
                 string date = $"{id.Year:d4}-12-{id.Day:d2}";
                 Console.WriteLine($"Solving puzzle for {date}, part {id.Part}");
-                string result = Solve(id.Year, id.Day, id.Part);
-                
+                string result = await Solve(id.Year, id.Day, id.Part);
+
                 if (result is null) Console.WriteLine("Solution not found");
                 else Console.WriteLine($"Solution: \"{result}\"");
             }
@@ -46,10 +48,10 @@ namespace AdventOfCode
             return null;
         }
 
-        static string Solve(int year, int day, int part)
+        static async Task<string> Solve(int year, int day, int part)
         {
             // get a reader for the input
-            IEnumerable<string> input = ReadInput(year, day);
+            IEnumerable<string> input = await ReadInput(year, day);
             if (input is null)
             {
                 Console.WriteLine("Failed to read input");
@@ -70,7 +72,7 @@ namespace AdventOfCode
             return solution.Run(part, input);
         }
 
-        static IEnumerable<string> ReadInput(int year, int day)
+        static async Task<IEnumerable<string>> ReadInput(int year, int day)
         {
             var dataDir = Path.Combine("data", year.ToString("d4"));
             if (!Directory.Exists(dataDir)) Directory.CreateDirectory(dataDir);
@@ -79,17 +81,21 @@ namespace AdventOfCode
             if (!File.Exists(path))
             {
                 var url = $"https://adventofcode.com/{year}/day/{day}/input";
-                var client = new WebClient();
 
                 var cookie = ReadCookie();
                 if (cookie is null) return null;
 
                 Console.WriteLine("Downloading input file");
-                client.Headers.Add(HttpRequestHeader.Cookie, $"session={cookie}");
+
+                using var client = new HttpClient();
+                client.DefaultRequestHeaders.Add("Cookie", $"session={cookie}");
 
                 try
                 {
-                    client.DownloadFile(url, path);
+                    var response = await client.GetAsync(url);
+                    response.EnsureSuccessStatusCode();
+                    var content = await response.Content.ReadAsStringAsync();
+                    File.WriteAllText(path, content);
                 }
                 catch (Exception ex)
                 {
