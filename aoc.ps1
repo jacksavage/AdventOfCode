@@ -4,7 +4,6 @@ param(
   [int]$year = (Get-Date).Year
 )
 
-
 function readInput {
   $dataDir = "data\$year"
   if (-not (Test-Path $dataDir)) {
@@ -36,14 +35,25 @@ function readInput {
   Get-Content $inputPath
 }
 
+function runGleam {
+  Write-Error 'running with gleam'
+  Push-Location .\gleam\src
+  readInput | gleam run $year $day $part
+  Pop-Location
+}
+
+function runCsharp {
+  Write-Error 'running with csharp'
+  readInput | dotnet run --project .\csharp $year $day $part
+}
+
+function runPwsh {
+  Write-Output 'running with pwsh'
+  readInput | .\pwsh\main.ps1 -year $year -day $day -part $part @PSBoundParameters
+}
+
 switch ($year) {
-  2020 {
-    readInput | dotnet run --project .\csharp $year $day $part
-  }
-  2025 {
-    Push-Location .\gleam\src
-    readInput | gleam run
-    Pop-Location
-  }
+  2020 { runCsharp }
+  2025 { runPwsh }
   default { Write-Error "No solutions for year $year" }
 }
