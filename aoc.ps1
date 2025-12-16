@@ -20,7 +20,7 @@ function readInput {
 
     $cookie = Get-Content $cookieFile -Raw
     $url = "https://adventofcode.com/$year/day/$day/input"
-    Write-Host 'Downloading input file'
+    Write-Information 'Downloading input file'
 
     try {
       $headers = @{ Cookie = "session=$cookie" }
@@ -36,19 +36,19 @@ function readInput {
 }
 
 function runGleam {
-  Write-Error 'running with gleam'
+  Write-Information 'running with gleam'
   Push-Location .\gleam\src
   readInput | gleam run $year $day $part
   Pop-Location
 }
 
 function runCsharp {
-  Write-Error 'running with csharp'
+  Write-Information 'running with csharp'
   readInput | dotnet run --project .\csharp $year $day $part
 }
 
 function runPwsh {
-  Write-Output 'running with pwsh'
+  Write-Information 'running with pwsh'
   readInput | .\pwsh\main.ps1 -year $year -day $day -part $part @PSBoundParameters
 }
 
